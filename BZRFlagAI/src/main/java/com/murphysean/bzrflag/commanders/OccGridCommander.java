@@ -7,9 +7,11 @@ import com.murphysean.bzrflag.events.BZRFlagEvent;
 import com.murphysean.bzrflag.events.OccGridCompleteEvent;
 import com.murphysean.bzrflag.events.OccGridEvent;
 import com.murphysean.bzrflag.models.Game;
+import com.murphysean.bzrflag.models.Point;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import edu.byu.cs.bzrflag.models.Map;
 
@@ -19,6 +21,8 @@ public class OccGridCommander extends AbstractCommander{
 	protected transient List<List<Float>> occGrid;
 	@JsonIgnore
 	protected static transient List<Map> maps;
+	@JsonIgnore
+	protected transient List<Integer> goToGrid;
 
 	public OccGridCommander(){
 		super();
@@ -28,6 +32,14 @@ public class OccGridCommander extends AbstractCommander{
 	public void setGame(Game game){
 		super.setGame(game);
 
+		// -1 : unassigned
+		// 0-99 : assigned
+		// 100 : visited
+		goToGrid = new ArrayList<Integer>();
+		for (int i = 0; i < 100; i++) {
+				goToGrid.add(i,-1);
+		}
+
 		//Set up my team right here
 		for(int i = 0; i < playerCount; i++){
 			GoToAgent goToAgent = new GoToAgent();
@@ -35,7 +47,7 @@ public class OccGridCommander extends AbstractCommander{
 			goToAgent.setId(i);
 			goToAgent.setCallsign(game.getTeam().getColor() + i);
 			goToAgent.setTeamColor(game.getTeam().getColor());
-			goToAgent.setTarget(game.getTeams().get(i % game.getTeams().size()).getBase().getCenterPoint());
+			goToAgent.setTarget(getUnassignedPoint(i));
 			tanks.add(goToAgent);
 		}
 
@@ -49,10 +61,16 @@ public class OccGridCommander extends AbstractCommander{
 
 				//Well in reality we should flip a non-occupied cell much more often than an occupied cell
 				//and the likelyhood of a spot being an obstacle is overall very low 1/100, realistically even smaller than this
-				occGrid.get(i).add(0.01f);
+				occGrid.get(i).add(0.25f);
 			}
 		}
 
+		//TODO I need to get my tanks to explore the world
+
+		//TODO Some proposed methods, use pf to push the tank around the world, use discretized sections
+	}
+
+	public void processExistingMapsForPriorOccGrid(){
 		if(maps != null){
 			for(int i = 0; i < game.getWorldSize(); i++){
 				for(int j = 0; j < game.getWorldSize(); j++){
@@ -70,6 +88,26 @@ public class OccGridCommander extends AbstractCommander{
 					}
 				}
 			}
+		}
+	}
+
+	private Point getUnassignedPoint(int tankIndex) {
+		Point p = null;
+		List<Integer> unassigned = new ArrayList<Integer>();
+		for (int i = 0; i < 100; i++) {
+			if (goToGrid.get(i) == -1) {
+				unassigned.add(i);
+			}
+		}
+		int index = (int)Math.floor(Math.random() * unassigned.size());
+		int value = unassigned.get(index);
+		return getCenterPointInWorldCoordinates(value%10, value/10);
+	}
+
+	private void markGrid(int tankIndex, int mark) {
+		for (int i = 0; i < goToGrid.size(); i++) {
+			if (goToGrid.get(i) == tankIndex)
+				goToGrid.set(i, mark); // Mark that this spot has been visited
 		}
 	}
 
@@ -124,14 +162,27 @@ public class OccGridCommander extends AbstractCommander{
 					updateOccGrid(((OccGridEvent)event).getPosition().getX(),((OccGridEvent)event).getPosition().getY() + i,false);
 			}
 		}
+		else if (event instanceof GoToCompleteEvent) {
+			// Have this tank wait a bit, and then give it a new point
+			GoToAgent agent = ((GoToCompleteEvent)event).getGoToAgent();
+			if (((GoToCompleteEvent)event).hasArrived()) {
+				int tankIndex = agent.getId();
+				markGrid(tankIndex,100);
+				agent.setTarget(getUnassignedPoint(tankIndex));
+			} else {
+				markGrid(agent.getId(),-1);
+				agent.setTarget(getUnassignedPoint(agent.getId()));
+			}
+
+		}
 		if(listener != null && event instanceof OccGridCompleteEvent){
 			listener.onBZRFlagEvent(event);
 		}
 	}
 
-	/*public List<List<Float>> getOccGrid(){
+	public List<List<Float>> getOccGrid(){
 		return occGrid;
-	}*/
+	}
 
 	public float getOccGridValue(float x, float y){
 		int i = (int)Math.floor(x + (game.getWorldSize() / 2));
@@ -147,6 +198,11 @@ public class OccGridCommander extends AbstractCommander{
 		occGrid.get(i).set(j,value);
 
 		return value;
+	}
+	public Point getCenterPointInWorldCoordinates(int x, int y) {
+		x = (x * 80) + 40 - 400;
+		y = (y * 80) + 40 - 400;
+		return new Point(x,y);
 	}
 
 	/**
@@ -175,5 +231,24 @@ public class OccGridCommander extends AbstractCommander{
 	}
 	public static void setMaps(List<Map> maps){
 		OccGridCommander.maps = maps;
+	}
+
+	public static class GoToCompleteEvent extends BZRFlagEvent{
+		public static final String GO_TO_TANK_FINISHED = "finished";
+
+		protected GoToAgent goToAgent;
+		protected boolean arrived;
+
+		public GoToCompleteEvent(GoToAgent goToAgent, boolean arrived){
+			super(GO_TO_TANK_FINISHED);
+
+			this.goToAgent = goToAgent;
+			this.arrived = arrived;
+		}
+
+		public GoToAgent getGoToAgent(){
+			return goToAgent;
+		}
+		public boolean hasArrived() { return arrived; }
 	}
 }

@@ -1,9 +1,13 @@
 package com.murphysean.bzrflag.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.murphysean.bzrflag.commanders.OccGridCommander;
 import com.murphysean.bzrflag.controllers.PIDController;
+import com.murphysean.bzrflag.interfaces.Commander;
 import com.murphysean.bzrflag.models.Game;
 import com.murphysean.bzrflag.models.Point;
+
+import java.util.Date;
 
 public class GoToAgent extends AbstractAgent{
 	private static final float NINETY_DEGREES = 1.57079633f;
@@ -14,6 +18,8 @@ public class GoToAgent extends AbstractAgent{
 	protected Point target;
 	protected PIDController distanceController;
 	protected PIDController angleController;
+	protected transient long arrived = 0;
+	protected transient long assigned = 0;
 
 	public GoToAgent(){
 		distanceController = new PIDController();
@@ -32,12 +38,25 @@ public class GoToAgent extends AbstractAgent{
 	}
 	public void setTarget(Point target){
 		this.target = target;
+		assigned = System.currentTimeMillis();
 	}
 
 	@Override
 	public synchronized void update(String status, int shotsAvailable, float timeToReload, String flag, float positionX, float positionY, float velocityX, float velocityY, float angle, float angleVelocity){
 		//Invoke the default behavior
 		super.update(status,shotsAvailable,timeToReload,flag,positionX,positionY,velocityX,velocityY,angle,angleVelocity);
+
+		if (arrived != 0 && System.currentTimeMillis() - arrived > 3000) {
+			arrived = 0;
+			OccGridCommander.GoToCompleteEvent event = new OccGridCommander.GoToCompleteEvent(this, true);
+			((Commander)game.getTeam()).bzrFlagEventHandler(event);
+		}
+
+		if (assigned != 0 && System.currentTimeMillis() - assigned > 25000) {
+			assigned = 0;
+			OccGridCommander.GoToCompleteEvent event = new OccGridCommander.GoToCompleteEvent(this, false);
+			((Commander)game.getTeam()).bzrFlagEventHandler(event);
+		}
 
 		if(target == null)
 			return;
@@ -55,7 +74,7 @@ public class GoToAgent extends AbstractAgent{
 			desiredAngularVelocity = 0f;
 
 			target = null;
-			//TODO We are there, throw an event notifying this
+			arrived = System.currentTimeMillis();
 			return;
 		}
 
