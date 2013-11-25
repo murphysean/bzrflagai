@@ -137,7 +137,7 @@ public class GameActivity extends Activity implements CommanderListener{
 			Game game = GameService.gameController.getGame();
 			if(game.getTeam() instanceof OccGridCommander){
 				OccGridCommander occGridCommander = (OccGridCommander)game.getTeam();
-				occGridCommander.setListener(this);
+				//occGridCommander.setListener(this);
 			}
 		}
 	}

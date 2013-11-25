@@ -23,7 +23,9 @@ public class OccGridCommander extends AbstractCommander{
 	protected static transient List<Map> maps;
 	@JsonIgnore
 	protected transient List<Integer> goToGrid;
-
+    @JsonIgnore
+    protected transient List<Integer> assignmentCount;
+    private static int MAX_COUNT = 5;
 	public OccGridCommander(){
 		super();
 	}
@@ -36,8 +38,10 @@ public class OccGridCommander extends AbstractCommander{
 		// 0-99 : assigned
 		// 100 : visited
 		goToGrid = new ArrayList<Integer>();
+        assignmentCount = new ArrayList<Integer>();
 		for (int i = 0; i < 100; i++) {
-				goToGrid.add(i,-1);
+            assignmentCount.add(i,0);
+			goToGrid.add(i,-1);
 		}
 
 		//Set up my team right here
@@ -64,6 +68,8 @@ public class OccGridCommander extends AbstractCommander{
 				occGrid.get(i).add(0.25f);
 			}
 		}
+
+        //processExistingMapsForPriorOccGrid();
 
 		//TODO I need to get my tanks to explore the world
 
@@ -101,13 +107,20 @@ public class OccGridCommander extends AbstractCommander{
 		}
 		int index = (int)Math.floor(Math.random() * unassigned.size());
 		int value = unassigned.get(index);
+        // Increment count
+        assignmentCount.add(index,assignmentCount.get(index)+1);
 		return getCenterPointInWorldCoordinates(value%10, value/10);
 	}
 
 	private void markGrid(int tankIndex, int mark) {
+
 		for (int i = 0; i < goToGrid.size(); i++) {
-			if (goToGrid.get(i) == tankIndex)
+			if (goToGrid.get(i) == tankIndex) {
+                // Check assignment count for this one
+                if (assignmentCount.get(i) >= MAX_COUNT)
+                    mark = 100;
 				goToGrid.set(i, mark); // Mark that this spot has been visited
+            }
 		}
 	}
 
