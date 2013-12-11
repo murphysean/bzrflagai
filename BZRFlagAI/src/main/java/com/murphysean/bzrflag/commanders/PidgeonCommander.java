@@ -19,7 +19,7 @@ public class PidgeonCommander extends AbstractCommander {
     private Point dumbPidgeonSpot;
     private static final long DUMB_PIDGEON_WAIT = 30000; // 30 sec
     private static final long SMART_PIDGEON_THRESHOLD = 40;
-    private static final long BUFFER = 5;
+    private static final long BUFFER = 20;
 
     public PidgeonCommander() {
         super();
@@ -31,7 +31,7 @@ public class PidgeonCommander extends AbstractCommander {
 
         // Create three goToAgents, one for each thing
         // Ensure team has at least 3
-        float range = game.getShotRange();
+        float range = game.getShotRange() * 2/3;
         dumbPidgeonSpot = new Point(range*-1, range);
         if (playerCount < 3)
             throw new RuntimeException("Must have 3 tanks for a Pidgeon Commander");
