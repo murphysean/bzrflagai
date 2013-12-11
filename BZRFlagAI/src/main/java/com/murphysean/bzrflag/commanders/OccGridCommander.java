@@ -11,7 +11,6 @@ import com.murphysean.bzrflag.models.Point;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import edu.byu.cs.bzrflag.models.Map;
 
@@ -51,7 +50,7 @@ public class OccGridCommander extends AbstractCommander{
 			goToAgent.setId(i);
 			goToAgent.setCallsign(game.getTeam().getColor() + i);
 			goToAgent.setTeamColor(game.getTeam().getColor());
-			goToAgent.setTarget(getUnassignedPoint(i));
+			goToAgent.setDestination(getUnassignedPoint(i));
 			tanks.add(goToAgent);
 		}
 
@@ -181,10 +180,10 @@ public class OccGridCommander extends AbstractCommander{
 			if (((GoToCompleteEvent)event).hasArrived()) {
 				int tankIndex = agent.getId();
 				markGrid(tankIndex,100);
-				agent.setTarget(getUnassignedPoint(tankIndex));
+				agent.setDestination(getUnassignedPoint(tankIndex));
 			} else {
 				markGrid(agent.getId(),-1);
-				agent.setTarget(getUnassignedPoint(agent.getId()));
+				agent.setDestination(getUnassignedPoint(agent.getId()));
 			}
 
 		}

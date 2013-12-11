@@ -60,7 +60,7 @@ public class GameActivity extends Activity implements CommanderListener{
 					Game game = GameService.gameController.getGame();
 					if(game.getTeam().getTanks().get(0) instanceof GoToAgent){
 						Point gotopoint = new Point((float)Math.floor(touchPoint[0] - 400), (float)Math.floor((touchPoint[1] - 400) * -1));
-						((GoToAgent)game.getTeam().getTanks().get(0)).setTarget(gotopoint);
+						((GoToAgent)game.getTeam().getTanks().get(0)).setDestination(gotopoint);
 					}
 				}
 				refreshing = false;
@@ -106,7 +106,7 @@ public class GameActivity extends Activity implements CommanderListener{
 										paint.setARGB(255,color,color,color);
 										canvas.drawPoint(occGridCommander.getBitmapX(x),occGridCommander.getBitmapY(y),paint);
 									}
-									sendInvalidate(game.getTeam().getTanks().get(0).getPosition(), ((GoToAgent)game.getTeam().getTanks().get(0)).getTarget());
+									sendInvalidate(game.getTeam().getTanks().get(0).getPosition(), ((GoToAgent)game.getTeam().getTanks().get(0)).getDestination());
 								}
 							}
 						}
@@ -232,10 +232,10 @@ public class GameActivity extends Activity implements CommanderListener{
 				public void run(){
 					if(GameService.gameController != null){
 						Game game = GameService.gameController.getGame();
-						if(((GoToAgent)game.getTeam().getTanks().get(0)).getTarget() == null)
+						if(((GoToAgent)game.getTeam().getTanks().get(0)).getDestination() == null)
 							targetPosition.setText("TP: NULL");
 						else
-							targetPosition.setText("TP: (" + ((GoToAgent)game.getTeam().getTanks().get(0)).getTarget().getX() + ", " + ((GoToAgent)game.getTeam().getTanks().get(0)).getTarget().getY() + ")");
+							targetPosition.setText("TP: (" + ((GoToAgent)game.getTeam().getTanks().get(0)).getDestination().getX() + ", " + ((GoToAgent)game.getTeam().getTanks().get(0)).getDestination().getY() + ")");
 					}
 				}
 			});
