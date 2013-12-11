@@ -44,6 +44,10 @@ public class GoToAgent extends AbstractAgent{
 		//Invoke the default behavior
 		super.update(status,shotsAvailable,timeToReload,flag,positionX,positionY,velocityX,velocityY,angle,angleVelocity);
 
+        if (status.equals("dead")) {
+            arrived = 0;
+        }
+
 		if (arrived != 0 && System.currentTimeMillis() - arrived > 3000) {
 			arrived = 0;
 			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, System.currentTimeMillis() - arrived);
