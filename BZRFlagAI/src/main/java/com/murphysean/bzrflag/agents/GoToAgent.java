@@ -1,13 +1,11 @@
 package com.murphysean.bzrflag.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.murphysean.bzrflag.commanders.OccGridCommander;
 import com.murphysean.bzrflag.controllers.PIDController;
+import com.murphysean.bzrflag.events.BZRFlagEvent;
 import com.murphysean.bzrflag.interfaces.Commander;
 import com.murphysean.bzrflag.models.Game;
 import com.murphysean.bzrflag.models.Point;
-
-import java.util.Date;
 
 public class GoToAgent extends AbstractAgent{
 	private static final float NINETY_DEGREES = 1.57079633f;
@@ -48,13 +46,7 @@ public class GoToAgent extends AbstractAgent{
 
 		if (arrived != 0 && System.currentTimeMillis() - arrived > 3000) {
 			arrived = 0;
-			OccGridCommander.GoToCompleteEvent event = new OccGridCommander.GoToCompleteEvent(this, true);
-			((Commander)game.getTeam()).bzrFlagEventHandler(event);
-		}
-
-		if (assigned != 0 && System.currentTimeMillis() - assigned > 25000) {
-			assigned = 0;
-			OccGridCommander.GoToCompleteEvent event = new OccGridCommander.GoToCompleteEvent(this, false);
+			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, System.currentTimeMillis() - arrived);
 			((Commander)game.getTeam()).bzrFlagEventHandler(event);
 		}
 
@@ -97,5 +89,31 @@ public class GoToAgent extends AbstractAgent{
 		//if(timeToReload <= 0.0f)
 		//	return true;
 		return false;
+	}
+
+	public static class GoToCompleteEvent extends BZRFlagEvent{
+		public static final String GO_TO_TANK_FINISHED = "finished";
+
+		protected GoToAgent goToAgent;
+		protected long arrived;
+		protected long millisAtDestination;
+
+		public GoToCompleteEvent(GoToAgent goToAgent, long arrived, long millisAtDestination){
+			super(GO_TO_TANK_FINISHED);
+
+			this.goToAgent = goToAgent;
+			this.arrived = arrived;
+			this.millisAtDestination = millisAtDestination;
+		}
+
+		public GoToAgent getGoToAgent(){
+			return goToAgent;
+		}
+		public long getArrived(){
+			return arrived;
+		}
+		public long getMillisAtDestination(){
+			return millisAtDestination;
+		}
 	}
 }
