@@ -35,7 +35,7 @@ public class PFAgent extends AbstractAgent{
 		retHome = false;
 		type = "pf";
 		angleController = new PIDController();
-		//I always desire my tank to be 0 degrees from my target rotation
+		//I always desire my tank to be 0 degrees from my destination rotation
 		angleController.setSetPoint(0.0f);
 	}
 

@@ -93,7 +93,7 @@ public class GameController implements Runnable{
 			bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
 			//Make one time calls to initialize the agent
-			//These need to be syncronous calls
+			//These need to be synchronous calls
 			game.setState("initializing");
 			handshake();
 			readConstants();

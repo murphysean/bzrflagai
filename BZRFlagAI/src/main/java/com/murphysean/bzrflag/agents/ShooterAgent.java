@@ -1,9 +1,6 @@
 package com.murphysean.bzrflag.agents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.murphysean.bzrflag.commanders.OccGridCommander;
-import com.murphysean.bzrflag.controllers.PIDController;
-import com.murphysean.bzrflag.interfaces.Commander;
 import com.murphysean.bzrflag.models.Game;
 import com.murphysean.bzrflag.models.KalmanTank;
 import com.murphysean.bzrflag.models.Point;
@@ -23,11 +20,11 @@ public class ShooterAgent extends GoToAgent{
 		this.game = game;
 	}
 
-	public Point getTarget(){
-		return target;
+	public Point getDestination(){
+		return destination;
 	}
-	public void setTarget(Point target){
-		this.target = target;
+	public void setDestination(Point target){
+		this.destination = target;
 		assigned = System.currentTimeMillis();
 	}
 

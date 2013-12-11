@@ -13,7 +13,7 @@ public class GoToAgent extends AbstractAgent{
 
 	@JsonIgnore
 	protected transient Game game;
-	protected Point target;
+	protected Point destination;
 	protected PIDController distanceController;
 	protected PIDController angleController;
 	protected transient long arrived = 0;
@@ -31,11 +31,11 @@ public class GoToAgent extends AbstractAgent{
 		this.game = game;
 	}
 
-	public Point getTarget(){
-		return target;
+	public Point getDestination(){
+		return destination;
 	}
-	public void setTarget(Point target){
-		this.target = target;
+	public void setDestination(Point destination){
+		this.destination = destination;
 		assigned = System.currentTimeMillis();
 	}
 
@@ -54,14 +54,14 @@ public class GoToAgent extends AbstractAgent{
 			((Commander)game.getTeam()).bzrFlagEventHandler(event);
 		}
 
-		if(target == null)
+		if(destination == null)
 			return;
 
 		//Wrap speed in some kind of pd controller? Might not need to do this tbh
-		float distance = (float)Math.sqrt(Math.pow(target.getX() - positionX,2.0d) + Math.pow(target.getY() - positionY,2.0d));
+		float distance = (float)Math.sqrt(Math.pow(destination.getX() - positionX,2.0d) + Math.pow(destination.getY() - positionY,2.0d));
 
 		//Calculate the angle to my goal
-		float ang = (float)Math.atan2(target.getY() - positionY,target.getX() - positionX);
+		float ang = (float)Math.atan2(destination.getY() - positionY,destination.getX() - positionX);
 		float diff = (float)Math.atan2(Math.sin(ang - angle),Math.cos(ang - angle));
 		float absdiff = Math.abs(diff);
 
@@ -69,7 +69,7 @@ public class GoToAgent extends AbstractAgent{
 			desiredSpeed = 0f;
 			desiredAngularVelocity = 0f;
 
-			target = null;
+			destination = null;
 			arrived = System.currentTimeMillis();
 			return;
 		}
@@ -78,7 +78,7 @@ public class GoToAgent extends AbstractAgent{
 
 
 
-		//If I'm greater than 90 degrees from my target angle, than speed = 0
+		//If I'm greater than 90 degrees from my destination angle, than speed = 0
 		if(absdiff > NINETY_DEGREES){
 			desiredSpeed = 0f;
 		}else{
