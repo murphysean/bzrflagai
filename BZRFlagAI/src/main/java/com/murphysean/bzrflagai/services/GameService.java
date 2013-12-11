@@ -84,33 +84,33 @@ public class GameService extends Service implements GameControllerListener{
 				String host = intent.getStringExtra(HOST_EXTRA);
 				String port = intent.getStringExtra(PORT_EXTRA);
 
-				List<Map> maps = new ArrayList<Map>();
-
-				//TODO Import all the maps so I can do occupancy queries
-				try{
-					maps.add(readMap(R.raw.final1));
-					maps.add(readMap(R.raw.final2));
-					maps.add(readMap(R.raw.four_ls));
-					maps.add(readMap(R.raw.hdkmaze));
-					maps.add(readMap(R.raw.maze1));
-					maps.add(readMap(R.raw.maze2));
-					maps.add(readMap(R.raw.pacman));
-					maps.add(readMap(R.raw.small_four_ls));
-					maps.add(readMap(R.raw.small_maze1));
-					maps.add(readMap(R.raw.small_maze2));
-					maps.add(readMap(R.raw.twoteams));
-				}catch(IOException e){
-					throw new RuntimeException(e);
-				}
-
-				for(int i = 0; i < maps.size(); i++){
-					if(!maps.get(i).isValid()){
-						Log.e("GameService", "Invalid Map @ " + i);
-						Log.e("GameService", "Invalid Box @ " + maps.get(i).getErrorIndex());
-					}
-				}
-
-				OccGridCommander.setMaps(maps);
+//				List<Map> maps = new ArrayList<Map>();
+//
+//				//TODO Import all the maps so I can do occupancy queries
+//				try{
+//					maps.add(readMap(R.raw.final1));
+//					maps.add(readMap(R.raw.final2));
+//					maps.add(readMap(R.raw.four_ls));
+//					maps.add(readMap(R.raw.hdkmaze));
+//					maps.add(readMap(R.raw.maze1));
+//					maps.add(readMap(R.raw.maze2));
+//					maps.add(readMap(R.raw.pacman));
+//					maps.add(readMap(R.raw.small_four_ls));
+//					maps.add(readMap(R.raw.small_maze1));
+//					maps.add(readMap(R.raw.small_maze2));
+//					maps.add(readMap(R.raw.twoteams));
+//				}catch(IOException e){
+//					throw new RuntimeException(e);
+//				}
+//
+//				for(int i = 0; i < maps.size(); i++){
+//					if(!maps.get(i).isValid()){
+//						Log.e("GameService", "Invalid Map @ " + i);
+//						Log.e("GameService", "Invalid Box @ " + maps.get(i).getErrorIndex());
+//					}
+//				}
+//
+//				OccGridCommander.setMaps(maps);
 
 				gameController = new GameController(UUID.randomUUID().toString(), host, Integer.parseInt(port));
 				gameController.setGameControllerListener(this);

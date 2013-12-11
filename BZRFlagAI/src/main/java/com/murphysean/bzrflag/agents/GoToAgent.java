@@ -50,8 +50,9 @@ public class GoToAgent extends AbstractAgent{
 
 		if (arrived != 0 && System.currentTimeMillis() - arrived > 3000) {
 			arrived = 0;
-			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, System.currentTimeMillis() - arrived);
+			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, System.currentTimeMillis() - arrived, destination);
 			((Commander)game.getTeam()).bzrFlagEventHandler(event);
+            destination = null;
 		}
 
 		if(destination == null)
@@ -69,7 +70,6 @@ public class GoToAgent extends AbstractAgent{
 			desiredSpeed = 0f;
 			desiredAngularVelocity = 0f;
 
-			destination = null;
 			arrived = System.currentTimeMillis();
 			return;
 		}
@@ -101,13 +101,15 @@ public class GoToAgent extends AbstractAgent{
 		protected GoToAgent goToAgent;
 		protected long arrived;
 		protected long millisAtDestination;
+        protected Point destination;
 
-		public GoToCompleteEvent(GoToAgent goToAgent, long arrived, long millisAtDestination){
+		public GoToCompleteEvent(GoToAgent goToAgent, long arrived, long millisAtDestination, Point destination){
 			super(GO_TO_TANK_FINISHED);
 
 			this.goToAgent = goToAgent;
 			this.arrived = arrived;
 			this.millisAtDestination = millisAtDestination;
+            this.destination = destination;
 		}
 
 		public GoToAgent getGoToAgent(){
@@ -119,5 +121,6 @@ public class GoToAgent extends AbstractAgent{
 		public long getMillisAtDestination(){
 			return millisAtDestination;
 		}
+        public Point getDestination() { return destination; }
 	}
 }
