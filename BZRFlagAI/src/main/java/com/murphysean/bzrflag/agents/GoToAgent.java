@@ -71,6 +71,11 @@ public class GoToAgent extends AbstractAgent{
 			return;
 		}
 
+        if (distance < 20) {
+            GoToAlmostThereEvent event = new GoToAlmostThereEvent(this, destination);
+            ((Commander)game.getTeam()).bzrFlagEventHandler(event);
+        }
+
 		desiredAngularVelocity = angleController.calculate(diff * -1f);
 
 
@@ -108,4 +113,23 @@ public class GoToAgent extends AbstractAgent{
 		}
         public Point getDestination() { return destination; }
 	}
+
+    public static class GoToAlmostThereEvent extends BZRFlagEvent{
+        public static final String GO_TO_TANK_FINISHED = "almost there";
+
+        protected GoToAgent goToAgent;
+        protected Point destination;
+
+        public GoToAlmostThereEvent(GoToAgent goToAgent, Point destination){
+            super(GO_TO_TANK_FINISHED);
+
+            this.goToAgent = goToAgent;
+            this.destination = destination;
+        }
+
+        public GoToAgent getGoToAgent(){
+            return goToAgent;
+        }
+        public Point getDestination() { return destination; }
+    }
 }

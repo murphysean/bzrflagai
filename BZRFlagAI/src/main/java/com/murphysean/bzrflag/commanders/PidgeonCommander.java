@@ -16,9 +16,10 @@ public class PidgeonCommander extends AbstractCommander {
     private Point smartPidgeonPoint;
     private GoToAgent dumbPidgeon, flyingPidgeon, smartPidgeon;
     private List<Point> flyingPoints, smartPoints;
-    private Point dumbPidgeonSpot = new Point(-200,200);
+    private Point dumbPidgeonSpot;
     private static final long DUMB_PIDGEON_WAIT = 30000; // 30 sec
-    private static final long SMART_PIDGEON_THRESHOLD = 20;
+    private static final long SMART_PIDGEON_THRESHOLD = 40;
+    private static final long BUFFER = 5;
 
     public PidgeonCommander() {
         super();
@@ -30,6 +31,8 @@ public class PidgeonCommander extends AbstractCommander {
 
         // Create three goToAgents, one for each thing
         // Ensure team has at least 3
+        float range = game.getShotRange();
+        dumbPidgeonSpot = new Point(range*-1, range);
         if (playerCount < 3)
             throw new RuntimeException("Must have 3 tanks for a Pidgeon Commander");
         dumbPidgeon = new GoToAgent();
@@ -55,16 +58,16 @@ public class PidgeonCommander extends AbstractCommander {
 
         // Points for flying pidgeon
         flyingPoints = new ArrayList<Point>();
-        flyingPoints.add(new Point(-20, -20));
-        flyingPoints.add(new Point(-380,-380));
-        flyingPoints.add(new Point(-20, -380));
-        flyingPoints.add(new Point(-380, -20));
+        flyingPoints.add(new Point(BUFFER*-1, BUFFER*-1));
+        flyingPoints.add(new Point(range*-1,range*-1));
+        flyingPoints.add(new Point(BUFFER*-1, range*-1));
+        flyingPoints.add(new Point(range*-1, BUFFER*-1));
 
         smartPoints = new ArrayList<Point>();
-        smartPoints.add(new Point(20, -20));
-        smartPoints.add(new Point(380, -380));
-        smartPoints.add(new Point(20, -380));
-        smartPoints.add(new Point(380, -20));
+        smartPoints.add(new Point(BUFFER, BUFFER*-1));
+        smartPoints.add(new Point(range, range*-1));
+        smartPoints.add(new Point(BUFFER, range*-1));
+        smartPoints.add(new Point(range, BUFFER*-1));
 
         // Gentlemen, start your pidgeons
         dumbPidgeon.setDestination(dumbPidgeonSpot);
@@ -72,7 +75,7 @@ public class PidgeonCommander extends AbstractCommander {
         smartPidgeonPoint = choosePoint(smartPoints);
 
         // Figure out where to tell him to go
-        smartPidgeon.setDestination(figureOutSmartPoint());
+        smartPidgeon.setDestination(smartPidgeonPoint);
 
     }
 
@@ -85,33 +88,40 @@ public class PidgeonCommander extends AbstractCommander {
         return Math.sqrt(Math.pow(y.getX() - x.getX(), 2) + Math.pow(y.getY() - x.getY(), 2));
     }
 
-    private Point figureOutSmartPoint() {
+    private Point figureOutSmartPoint(Point location) {
         // Based on smartPidgeonPoint, select a point that is slightly closer to that point but not too far from us currently
-        float ang = (float)Math.atan2(smartPidgeonPoint.getY() - smartPidgeon.getPosition().getY(),smartPidgeonPoint.getX() - smartPidgeon.getPosition().getX());
-        ang += (Math.random() * 0.34906585) - 0.174532925;
-        int x = (int)(smartPidgeon.getPosition().getX() + SMART_PIDGEON_THRESHOLD * Math.cos(ang));
-        int y = (int)(smartPidgeon.getPosition().getY() + SMART_PIDGEON_THRESHOLD * Math.sin(ang));
-        return new Point(x,y);
+        float xPos = location.getX() + 400;
+        float yPos = location.getY() + 400;
+        float xGoal = smartPidgeonPoint.getX() + 400;
+        float yGoal = smartPidgeonPoint.getY() + 400;
+
+        float addX = (xPos <= xGoal) ? xPos : xGoal;
+        int nextX = (int)(Math.random() * (Math.abs(xPos - xGoal))) + (int)addX - 400;
+        float addY = (yPos <= yGoal) ? yPos : yGoal;
+        int nextY = (int)(Math.random() * (Math.abs(yPos - yGoal))) + (int)addY - 400;
+        return new Point(nextX, nextY);
     }
 
     @Override
     public void bzrFlagEventHandler(BZRFlagEvent event) {
-        if (event instanceof GoToAgent.GoToCompleteEvent) {
-            GoToAgent agent = ((GoToAgent.GoToCompleteEvent)event).getGoToAgent();
+        if (event instanceof GoToAgent.GoToAlmostThereEvent) {
+            GoToAgent agent = ((GoToAgent.GoToAlmostThereEvent)event).getGoToAgent();
 
             // Determine which pidgeon we are on
             if (agent.getId() == 1) { // Straight line pidgeon
                 flyingPidgeon.setDestination(choosePoint(flyingPoints));
 
             } else if (agent.getId() == 2) { // Smart Pidgeon
-                if (((GoToAgent.GoToCompleteEvent)event).getDestination().equals(smartPidgeonPoint)) {
+                if (((GoToAgent.GoToAlmostThereEvent)event).getDestination().equals(smartPidgeonPoint)) {
                     // Figure out where to tell him to go
                     smartPidgeonPoint = choosePoint(smartPoints);
-                    smartPidgeon.setDestination(figureOutSmartPoint());
+                    smartPidgeon.setDestination(figureOutSmartPoint(((GoToAgent.GoToAlmostThereEvent)event).getDestination()));
 
                 } else {
-                    if (distanceBetweenPoints(smartPidgeonPoint,((GoToAgent.GoToCompleteEvent)event).getDestination()) < SMART_PIDGEON_THRESHOLD) {
+                    if (distanceBetweenPoints(smartPidgeonPoint,((GoToAgent.GoToAlmostThereEvent)event).getDestination()) < SMART_PIDGEON_THRESHOLD) {
                         smartPidgeon.setDestination(smartPidgeonPoint);
+                    } else {
+                        smartPidgeon.setDestination(figureOutSmartPoint(((GoToAgent.GoToAlmostThereEvent)event).getDestination()));
                     }
                 }
             }
