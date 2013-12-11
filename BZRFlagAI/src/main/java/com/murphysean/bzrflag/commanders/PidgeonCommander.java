@@ -110,7 +110,7 @@ public class PidgeonCommander extends AbstractCommander {
                     smartPidgeon.setDestination(figureOutSmartPoint());
 
                 } else {
-                    if (distanceBetweenPoints(smartPidgeonPoint,smartPidgeon.getDestination()) < SMART_PIDGEON_THRESHOLD) {
+                    if (distanceBetweenPoints(smartPidgeonPoint,((GoToAgent.GoToCompleteEvent)event).getDestination()) < SMART_PIDGEON_THRESHOLD) {
                         smartPidgeon.setDestination(smartPidgeonPoint);
                     }
                 }

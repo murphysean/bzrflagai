@@ -36,6 +36,7 @@ public class GoToAgent extends AbstractAgent{
 	}
 	public void setDestination(Point destination){
 		this.destination = destination;
+		this.arrived = 0;
 		assigned = System.currentTimeMillis();
 	}
 
@@ -47,13 +48,6 @@ public class GoToAgent extends AbstractAgent{
         if (status.equals("dead")) {
             arrived = 0;
         }
-
-		if (arrived != 0 && System.currentTimeMillis() - arrived > 3000) {
-			arrived = 0;
-			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, System.currentTimeMillis() - arrived, destination);
-			((Commander)game.getTeam()).bzrFlagEventHandler(event);
-            destination = null;
-		}
 
 		if(destination == null)
 			return;
@@ -71,6 +65,9 @@ public class GoToAgent extends AbstractAgent{
 			desiredAngularVelocity = 0f;
 
 			arrived = System.currentTimeMillis();
+			GoToCompleteEvent event = new GoToCompleteEvent(this, arrived, destination);
+			destination = null;
+			((Commander)game.getTeam()).bzrFlagEventHandler(event);
 			return;
 		}
 
@@ -88,27 +85,18 @@ public class GoToAgent extends AbstractAgent{
 		}
 	}
 
-	@Override
-	public synchronized boolean getDesiredTriggerStatus(){
-		//if(timeToReload <= 0.0f)
-		//	return true;
-		return false;
-	}
-
 	public static class GoToCompleteEvent extends BZRFlagEvent{
 		public static final String GO_TO_TANK_FINISHED = "finished";
 
 		protected GoToAgent goToAgent;
 		protected long arrived;
-		protected long millisAtDestination;
         protected Point destination;
 
-		public GoToCompleteEvent(GoToAgent goToAgent, long arrived, long millisAtDestination, Point destination){
+		public GoToCompleteEvent(GoToAgent goToAgent, long arrived, Point destination){
 			super(GO_TO_TANK_FINISHED);
 
 			this.goToAgent = goToAgent;
 			this.arrived = arrived;
-			this.millisAtDestination = millisAtDestination;
             this.destination = destination;
 		}
 
@@ -117,9 +105,6 @@ public class GoToAgent extends AbstractAgent{
 		}
 		public long getArrived(){
 			return arrived;
-		}
-		public long getMillisAtDestination(){
-			return millisAtDestination;
 		}
         public Point getDestination() { return destination; }
 	}

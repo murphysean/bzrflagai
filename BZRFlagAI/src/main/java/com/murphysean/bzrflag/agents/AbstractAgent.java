@@ -47,10 +47,7 @@ public abstract class AbstractAgent extends Tank implements Agent{
 	}
 
 	public synchronized boolean getDesiredTriggerStatus(){
-		boolean ret = desiredTriggerStatus;
-		if(ret)
-			desiredTriggerStatus = false;
-		return ret;
+		return false;
 	}
 
 	public synchronized void setDesiredTriggerStatus(boolean desiredTriggerStatus){

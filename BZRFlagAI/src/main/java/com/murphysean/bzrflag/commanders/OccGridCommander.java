@@ -174,10 +174,10 @@ public class OccGridCommander extends AbstractCommander{
 					updateOccGrid(((OccGridEvent)event).getPosition().getX(),((OccGridEvent)event).getPosition().getY() + i,false);
 			}
 		}
-		else if (event instanceof GoToCompleteEvent) {
+		else if (event instanceof GoToAgent.GoToCompleteEvent) {
 			// Have this tank wait a bit, and then give it a new point
-			GoToAgent agent = ((GoToCompleteEvent)event).getGoToAgent();
-			if (((GoToCompleteEvent)event).hasArrived()) {
+			GoToAgent agent = ((GoToAgent.GoToCompleteEvent)event).getGoToAgent();
+			if (((GoToAgent.GoToCompleteEvent)event).getArrived() > 0) {
 				int tankIndex = agent.getId();
 				markGrid(tankIndex,100);
 				agent.setDestination(getUnassignedPoint(tankIndex));
@@ -243,24 +243,5 @@ public class OccGridCommander extends AbstractCommander{
 	}
 	public static void setMaps(List<Map> maps){
 		OccGridCommander.maps = maps;
-	}
-
-	public static class GoToCompleteEvent extends BZRFlagEvent{
-		public static final String GO_TO_TANK_FINISHED = "finished";
-
-		protected GoToAgent goToAgent;
-		protected boolean arrived;
-
-		public GoToCompleteEvent(GoToAgent goToAgent, boolean arrived){
-			super(GO_TO_TANK_FINISHED);
-
-			this.goToAgent = goToAgent;
-			this.arrived = arrived;
-		}
-
-		public GoToAgent getGoToAgent(){
-			return goToAgent;
-		}
-		public boolean hasArrived() { return arrived; }
 	}
 }
