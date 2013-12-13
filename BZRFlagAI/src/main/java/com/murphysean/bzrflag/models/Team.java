@@ -34,7 +34,7 @@ public class Team{
 		flag.setTeamColor(color);
 
 		for(int i = 0; i < playerCount; i++){
-			Tank tank = new Tank();
+			Tank tank = new KalmanTank();
 			tank.setId(i);
 			tank.setCallsign(color + i);
 			tank.setTeamColor(color);
@@ -53,7 +53,7 @@ public class Team{
 		flag.setTeamColor(color);
 
 		for(int i = 0; i < playerCount; i++){
-			Tank tank = new Tank();
+			Tank tank = new KalmanTank();
 			tank.setId(i);
 			tank.setCallsign(color + i);
 			tank.setTeamColor(color);

@@ -9,6 +9,7 @@ public abstract class BZRFlagEvent{
 	public static final String TIMER_TYPE = "timer";
 	public static final String OCC_GRID_TYPE = "occgrid";
 	public static final String OCC_GRID_COMPETE_TYPE = "occgridcomplete";
+	public static final String KALMAN_TYPE = "kalman";
 
 	private volatile String type;
 
