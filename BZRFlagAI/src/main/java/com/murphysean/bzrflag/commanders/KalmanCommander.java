@@ -45,10 +45,12 @@ public class KalmanCommander extends AbstractCommander{
 			GoToAgent.GoToCompleteEvent goToCompleteEvent = (GoToAgent.GoToCompleteEvent)event;
 			//Pick an enemy tank to shoot at
 			Team enemyTeam = game.findTeamByColor("red");
-			bond.setTarget((KalmanTank)enemyTeam.getTanks().get(targetIndex++ % enemyTeam.getTanks().size()));
+			//bond.setTarget((KalmanTank)enemyTeam.getTanks().get(targetIndex++ % enemyTeam.getTanks().size()));
+			bond.setTarget((KalmanTank)enemyTeam.getTanks().get(1));
 		}else if(event instanceof ShooterAgent.AssassinateEvent){
 			Team enemyTeam = game.findTeamByColor("red");
-			bond.setTarget((KalmanTank)enemyTeam.getTanks().get(targetIndex++ % enemyTeam.getTanks().size()));
+			//bond.setTarget((KalmanTank)enemyTeam.getTanks().get(targetIndex++ % enemyTeam.getTanks().size()));
+			bond.setTarget((KalmanTank)enemyTeam.getTanks().get(1));
 		}
 	}
 

@@ -58,9 +58,8 @@ public class PidgeonCommander extends AbstractCommander {
 
         // Points for flying pidgeon
         flyingPoints = new ArrayList<Point>();
-        flyingPoints.add(new Point(range*-1,range*-1));
-        flyingPoints.add(new Point(BUFFER*-1, range*-1));
-        flyingPoints.add(new Point(range*-1, BUFFER*-1));
+        flyingPoints.add(new Point(-100,100));
+        flyingPoints.add(new Point(-100,-100));
 
         smartPoints = new ArrayList<Point>();
         smartPoints.add(new Point(range, range*-1));
@@ -78,7 +77,7 @@ public class PidgeonCommander extends AbstractCommander {
     }
 
     private Point choosePoint(List<Point> points) {
-        int index = (int)Math.floor(Math.random() * 2.9999);
+        int index = (int)Math.floor(Math.random() * 1.9999);
         return points.get(index);
     }
 

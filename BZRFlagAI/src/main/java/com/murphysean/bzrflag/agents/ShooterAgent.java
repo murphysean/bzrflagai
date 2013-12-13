@@ -1,9 +1,7 @@
 package com.murphysean.bzrflag.agents;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.murphysean.bzrflag.events.BZRFlagEvent;
 import com.murphysean.bzrflag.interfaces.Commander;
-import com.murphysean.bzrflag.models.Game;
 import com.murphysean.bzrflag.models.KalmanTank;
 import com.murphysean.bzrflag.models.Point;
 
@@ -50,19 +48,20 @@ public class ShooterAgent extends GoToAgent{
 		}
 
 		//Face towards the target's Kalman prediction location
-		if(shootAtTarget == null){
-			Point targetGuess = target.getKalmanPoint();
+		if(target.getId() != 0){
+			Point targetGuess = target.getCurrentKalmanPoint();
 			float distance = (float)Math.sqrt(Math.pow(targetGuess.getX() - positionX,2.0d) + Math.pow(targetGuess.getY() - positionY,2.0d));
 			float time = distance / game.getShotSpeed();
-			shootAtTarget = target.getFutureKalmanPoint((long)(time * 1000) + 1500);
-
-			//shootAtTarget = target.getFutureKalmanPoint();
+			//Add in some time (.1 seconds) to account for spinning, etc
+			shootAtTarget = target.getFutureKalmanPoint((long)(time * 1000) + 600);
+		}else{
+			shootAtTarget = target.getCurrentKalmanPoint();
 		}
 		if(shootAtTarget != null){
 			//Calculate the angle to my goal
 			float ang = (float)Math.atan2(shootAtTarget.getY() - positionY,shootAtTarget.getX() - positionX);
 			float diff = (float)Math.atan2(Math.sin(ang - angle),Math.cos(ang - angle));
-			desiredAngularVelocity = angleController.calculate(diff * -1f);
+			desiredAngularVelocity = diff;
 		}
 	}
 
@@ -75,8 +74,7 @@ public class ShooterAgent extends GoToAgent{
 		float ang = (float)Math.atan2(shootAtTarget.getY() - position.getY(),shootAtTarget.getX() - position.getX());
 		float diff = (float)Math.atan2(Math.sin(ang - angle),Math.cos(ang - angle));
 		float absdiff = Math.abs(diff);
-		if(absdiff <= QUARTER_DEGREE){
-			shootAtTarget = null;
+		if(absdiff <= ONE_DEGREE){
 			return true;
 		}
 		return false;

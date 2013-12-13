@@ -136,7 +136,7 @@ public class GameService extends Service implements GameControllerListener, Kalm
 	@Override
 	public void onKalmanEvent(KalmanEvent kalmanEvent){
 		ContentValues contentValues = new ContentValues();
-		contentValues.put("sessionid", kalmanEvent.getSessionId());
+		contentValues.put("sessionid", "alpha" + kalmanEvent.getSessionId());
 		contentValues.put("callsign", kalmanEvent.getCallsign());
 		contentValues.put("instant", kalmanEvent.getInstant());
 

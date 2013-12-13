@@ -13,7 +13,7 @@ import org.apache.commons.math3.linear.RealVector;
 import java.util.UUID;
 
 public class KalmanTank extends Tank{
-	private static final long UPDATE_FREQUENCY_MILLI = 500;
+	private static final long UPDATE_FREQUENCY_MILLI = 250;
 	public static KalmanListener listener = null;
 
 	public String sessionId;
@@ -33,33 +33,33 @@ public class KalmanTank extends Tank{
 		super();
 
 		transitionNoise.setEntry(0,0,1);
-		transitionNoise.setEntry(0,1,0.5);
-		transitionNoise.setEntry(0,2,0.125);
+		transitionNoise.setEntry(0,1,0.25);
+		transitionNoise.setEntry(0,2,0.03125);
 
 		transitionNoise.setEntry(1,1,1);
-		transitionNoise.setEntry(1,2,0.5);
+		transitionNoise.setEntry(1,2,0.25);
 
 		//Friction Coefficient
-		transitionNoise.setEntry(2,1,-0.1);
+		transitionNoise.setEntry(2,1,0.0);
 		transitionNoise.setEntry(2,2,1);
 
 		transitionNoise.setEntry(3,3,1);
-		transitionNoise.setEntry(3,4,0.5);
-		transitionNoise.setEntry(3,5,0.125);
+		transitionNoise.setEntry(3,4,0.25);
+		transitionNoise.setEntry(3,5,0.03125);
 
 		transitionNoise.setEntry(4,4,1);
-		transitionNoise.setEntry(4,5,0.5);
+		transitionNoise.setEntry(4,5,0.25);
 
 		//Friction Coefficient
-		transitionNoise.setEntry(5,4,-0.1);
+		transitionNoise.setEntry(5,4,0.0);
 		transitionNoise.setEntry(5,5,1);
 
-		stateNoise.setEntry(0,0,0.1);
+		stateNoise.setEntry(0,0,100);
 		stateNoise.setEntry(1,1,0.1);
-		stateNoise.setEntry(2,2,100);
-		stateNoise.setEntry(3,3,0.1);
+		stateNoise.setEntry(2,2,0.1);
+		stateNoise.setEntry(3,3,100);
 		stateNoise.setEntry(4,4,0.1);
-		stateNoise.setEntry(5,5,100);
+		stateNoise.setEntry(5,5,0.1);
 
 		observationMatrix.setEntry(0,0,1);
 		observationMatrix.setEntry(1,3,1);
@@ -125,7 +125,7 @@ public class KalmanTank extends Tank{
 
 	}
 
-	public synchronized Point getKalmanPoint(){
+	public synchronized Point getCurrentKalmanPoint(){
 		return new Point((float)prevMean.getEntry(0), (float)prevMean.getEntry(3));
 	}
 
@@ -141,7 +141,7 @@ public class KalmanTank extends Tank{
 			predictionNoise.setEntry(1,2,deltaT);
 
 			//Friction Coefficient
-			predictionNoise.setEntry(2,1,-0.1);
+			predictionNoise.setEntry(2,1,0.0);
 			predictionNoise.setEntry(2,2,1);
 
 			predictionNoise.setEntry(3,3,1);
@@ -152,7 +152,7 @@ public class KalmanTank extends Tank{
 			predictionNoise.setEntry(4,5,deltaT);
 
 			//Friction Coefficient
-			predictionNoise.setEntry(5,4,-0.1);
+			predictionNoise.setEntry(5,4,0.0);
 			predictionNoise.setEntry(5,5,1);
 
 			RealVector predic = predictionNoise.operate(prevMean);
