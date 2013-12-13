@@ -58,13 +58,11 @@ public class PidgeonCommander extends AbstractCommander {
 
         // Points for flying pidgeon
         flyingPoints = new ArrayList<Point>();
-        flyingPoints.add(new Point(BUFFER*-1, BUFFER*-1));
         flyingPoints.add(new Point(range*-1,range*-1));
         flyingPoints.add(new Point(BUFFER*-1, range*-1));
         flyingPoints.add(new Point(range*-1, BUFFER*-1));
 
         smartPoints = new ArrayList<Point>();
-        smartPoints.add(new Point(BUFFER, BUFFER*-1));
         smartPoints.add(new Point(range, range*-1));
         smartPoints.add(new Point(BUFFER, range*-1));
         smartPoints.add(new Point(range, BUFFER*-1));
@@ -80,7 +78,7 @@ public class PidgeonCommander extends AbstractCommander {
     }
 
     private Point choosePoint(List<Point> points) {
-        int index = (int)Math.floor(Math.random() * 3.9999);
+        int index = (int)Math.floor(Math.random() * 2.9999);
         return points.get(index);
     }
 
@@ -90,16 +88,12 @@ public class PidgeonCommander extends AbstractCommander {
 
     private Point figureOutSmartPoint(Point location) {
         // Based on smartPidgeonPoint, select a point that is slightly closer to that point but not too far from us currently
-        float xPos = location.getX() + 400;
-        float yPos = location.getY() + 400;
-        float xGoal = smartPidgeonPoint.getX() + 400;
-        float yGoal = smartPidgeonPoint.getY() + 400;
-
-        float addX = (xPos <= xGoal) ? xPos : xGoal;
-        int nextX = (int)(Math.random() * (Math.abs(xPos - xGoal))) + (int)addX - 400;
-        float addY = (yPos <= yGoal) ? yPos : yGoal;
-        int nextY = (int)(Math.random() * (Math.abs(yPos - yGoal))) + (int)addY - 400;
-        return new Point(nextX, nextY);
+        // Based on smartPidgeonPoint, select a point that is slightly closer to that point but not too far from us currently
+        float ang = (float)Math.atan2(smartPidgeonPoint.getY() - location.getY(),smartPidgeonPoint.getX() - location.getX());
+        ang += (Math.random() * 0.767944871) - 0.383972435;
+        int x = (int)(location.getX() + SMART_PIDGEON_THRESHOLD * Math.cos(ang));
+        int y = (int)(location.getY() + SMART_PIDGEON_THRESHOLD * Math.sin(ang));
+        return new Point(x,y);
     }
 
     @Override
