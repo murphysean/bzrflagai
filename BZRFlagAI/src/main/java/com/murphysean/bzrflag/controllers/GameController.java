@@ -1,6 +1,7 @@
 package com.murphysean.bzrflag.controllers;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.murphysean.bzrflag.commanders.KalmanCommander;
 import com.murphysean.bzrflag.commanders.OccGridCommander;
 import com.murphysean.bzrflag.commanders.PFEvolutionCommander;
 import com.murphysean.bzrflag.commanders.PidgeonCommander;
@@ -121,7 +122,9 @@ public class GameController implements Runnable{
 				commander = new OccGridCommander();
 			} else if (game.getCommanderType().equals("PidgeonCommander")) {
                 commander = new PidgeonCommander();
-            }
+            }else if(game.getCommanderType().equals("KalmanCommander")){
+				commander = new KalmanCommander();
+			}
 			commander.setGame(game);
 
 			//These will help speed up the occGrid Impl

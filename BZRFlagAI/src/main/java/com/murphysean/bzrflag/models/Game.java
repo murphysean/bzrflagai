@@ -56,7 +56,7 @@ public class Game{
 
 	public Game(){
 		state = "instantiated";
-		commanderType = "PidgeonCommander";
+		commanderType = "KalmanCommander";
 		agentType = "PFAgent";
 		teams = new ArrayList<Team>();
 		obstacles = new ArrayList<Obstacle>();

@@ -212,7 +212,7 @@ public class PFAgent extends AbstractAgent{
 			}
 		}
 
-		//Put tangentials on enemy tanks with a close radius (to avoid getting stuck)
+		//Put tangentials on target tanks with a close radius (to avoid getting stuck)
 		PotentialField tankField = new PotentialField();
 		tankField.setRadius(game.getTankRadius());
 		tankField.setSpread(game.getTankRadius() / 2);
